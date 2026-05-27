@@ -1,0 +1,91 @@
+const TRIVIA_QUESTIONS = [
+  // General Knowledge
+  { question: "What is the capital of France?", answer: "Paris", category: "General Knowledge" },
+  { question: "Which planet is known as the Red Planet?", answer: "Mars", category: "General Knowledge" },
+  { question: "What is the largest ocean on Earth?", answer: "Pacific", category: "General Knowledge" },
+  { question: "How many colors are there in a rainbow?", answer: "Seven", category: "General Knowledge" },
+  { question: "What is the name of the fairy in Peter Pan?", answer: "Tinkerbell", category: "General Knowledge" },
+  { question: "Which animal is known as the King of the Jungle?", answer: "Lion", category: "General Knowledge" },
+  { question: "What is the standard currency of the United Kingdom?", answer: "Pound", category: "General Knowledge" },
+  { question: "Which country is home to the Kangaroo?", answer: "Australia", category: "General Knowledge" },
+  { question: "What is the hardest natural substance on Earth?", answer: "Diamond", category: "General Knowledge" },
+  { question: "How many days are in a leap year?", answer: "366", category: "General Knowledge" },
+  { question: "What is the primary language spoken in Brazil?", answer: "Portuguese", category: "General Knowledge" },
+  { question: "What element does a diamond consist of?", answer: "Carbon", category: "General Knowledge" },
+  { question: "What color is a school bus in the US?", answer: "Yellow", category: "General Knowledge" },
+  { question: "How many legs does a spider have?", answer: "Eight", category: "General Knowledge" },
+  { question: "What is the capital city of Japan?", answer: "Tokyo", category: "General Knowledge" },
+
+  // Science & Tech
+  { question: "What is the chemical symbol for Gold?", answer: "Au", category: "Science & Tech" },
+  { question: "What is the closest star to Earth?", answer: "Sun", category: "Science & Tech" },
+  { question: "What gas do plants absorb from the atmosphere for photosynthesis?", answer: "Carbon Dioxide", category: "Science & Tech" },
+  { question: "What is the power house of the cell?", answer: "Mitochondria", category: "Science & Tech" },
+  { question: "Who is credited with inventing the World Wide Web?", answer: "Tim Berners-Lee", category: "Science & Tech" },
+  { question: "What is the chemical formula for water?", answer: "H2O", category: "Science & Tech" },
+  { question: "Which planet is closest to the Sun?", answer: "Mercury", category: "Science & Tech" },
+  { question: "What is the speed of sound in a vacuum (in meters per second)?", answer: "Zero", category: "Science & Tech" },
+  { question: "What programming language is named after a type of snake?", answer: "Python", category: "Science & Tech" },
+  { question: "What does CPU stand for?", answer: "Central Processing Unit", category: "Science & Tech" },
+  { question: "What is the atomic number of Hydrogen?", answer: "1", category: "Science & Tech" },
+  { question: "Which organ in the human body consumes the most energy?", answer: "Brain", category: "Science & Tech" },
+  { question: "What is the unit of electrical resistance?", answer: "Ohm", category: "Science & Tech" },
+  { question: "Which planet has the most moons?", answer: "Saturn", category: "Science & Tech" },
+  { question: "What is the main gas found in the air we breathe?", answer: "Nitrogen", category: "Science & Tech" },
+
+  // History & Geography
+  { question: "Who was the first President of the United States?", answer: "George Washington", category: "History & Geography" },
+  { question: "What is the longest river in the world?", answer: "Nile", category: "History & Geography" },
+  { question: "In which country would you find the Great Pyramid of Giza?", answer: "Egypt", category: "History & Geography" },
+  { question: "Which year did World War II end?", answer: "1945", category: "History & Geography" },
+  { question: "What is the smallest country in the world?", answer: "Vatican City", category: "History & Geography" },
+  { question: "Who was the first person to step on the Moon?", answer: "Neil Armstrong", category: "History & Geography" },
+  { question: "Which civilization built the Machu Picchu in Peru?", answer: "Inca", category: "History & Geography" },
+  { question: "What is the capital of Australia?", answer: "Canberra", category: "History & Geography" },
+  { question: "Which empire was ruled by Julius Caesar?", answer: "Roman Empire", category: "History & Geography" },
+  { question: "Which country is also known as the Land of the Rising Sun?", answer: "Japan", category: "History & Geography" },
+  { question: "What is the largest country by land area?", answer: "Russia", category: "History & Geography" },
+  { question: "Which explorer is credited with discovering America in 1492?", answer: "Christopher Columbus", category: "History & Geography" },
+  { question: "What was the previous name of Istanbul?", answer: "Constantinople", category: "History & Geography" },
+  { question: "Which mountain is the tallest in the world?", answer: "Mount Everest", category: "History & Geography" },
+  { question: "Which canal connects the Atlantic and Pacific Oceans?", answer: "Panama Canal", category: "History & Geography" },
+
+  // Pop Culture & Movies
+  { question: "Which movie won the first Academy Award for Best Picture?", answer: "Wings", category: "Pop Culture & Movies" },
+  { question: "Who played Jack Dawson in the movie Titanic?", answer: "Leonardo DiCaprio", category: "Pop Culture & Movies" },
+  { question: "What is the name of the fictional wizarding school in Harry Potter?", answer: "Hogwarts", category: "Pop Culture & Movies" },
+  { question: "Which band sang the hit song 'Bohemian Rhapsody'?", answer: "Queen", category: "Pop Culture & Movies" },
+  { question: "Who is the creator of the Star Wars franchise?", answer: "George Lucas", category: "Pop Culture & Movies" },
+  { question: "Which actress played Katniss Everdeen in The Hunger Games?", answer: "Jennifer Lawrence", category: "Pop Culture & Movies" },
+  { question: "What is the highest-grossing film of all time (unadjusted for inflation)?", answer: "Avatar", category: "Pop Culture & Movies" },
+  { question: "Which pop singer is known as the 'King of Pop'?", answer: "Michael Jackson", category: "Pop Culture & Movies" },
+  { question: "What is the name of Simba's father in The Lion King?", answer: "Mufasa", category: "Pop Culture & Movies" },
+  { question: "Which superhero is also known as Bruce Wayne?", answer: "Batman", category: "Pop Culture & Movies" },
+  { question: "What is the name of the coffee shop in the TV show Friends?", answer: "Central Perk", category: "Pop Culture & Movies" },
+  { question: "Which singer released the album 'Midnights' in 2022?", answer: "Taylor Swift", category: "Pop Culture & Movies" },
+  { question: "Who directed the movie 'Interstellar' and 'Inception'?", answer: "Christopher Nolan", category: "Pop Culture & Movies" },
+  { question: "What is the name of the toy cowboy in Toy Story?", answer: "Woody", category: "Pop Culture & Movies" },
+  { question: "Which sitcom features characters named Sheldon, Leonard, and Penny?", answer: "The Big Bang Theory", category: "Pop Culture & Movies" },
+
+  // Sports & Games
+  { question: "How many players are on the field for one team in a soccer match?", answer: "11", category: "Sports & Games" },
+  { question: "Which country has won the most FIFA World Cups?", answer: "Brazil", category: "Sports & Games" },
+  { question: "What is the highest score possible with a single dart in darts?", answer: "60", category: "Sports & Games" },
+  { question: "Which game features terms like 'checkmate' and 'castling'?", answer: "Chess", category: "Sports & Games" },
+  { question: "How many rings are there on the Olympic flag?", answer: "Five", category: "Sports & Games" },
+  { question: "Who is often considered the greatest basketball player of all time, wearing jersey #23 for the Chicago Bulls?", answer: "Michael Jordan", category: "Sports & Games" },
+  { question: "What color card does a referee show to eject a player in soccer?", answer: "Red", category: "Sports & Games" },
+  { question: "In tennis, what word represents a score of zero?", answer: "Love", category: "Sports & Games" },
+  { question: "How many pockets are there on a standard pool table?", answer: "Six", category: "Sports & Games" },
+  { question: "Which golf tournament awards the winner a Green Jacket?", answer: "The Masters", category: "Sports & Games" },
+  { question: "What is the diameter of a basketball hoop in inches?", answer: "18", category: "Sports & Games" },
+  { question: "In which sport would you use a shuttlecock?", answer: "Badminton", category: "Sports & Games" },
+  { question: "What board game involves buying property and building hotels?", answer: "Monopoly", category: "Sports & Games" },
+  { question: "How many strikes in a row make a 'turkey' in bowling?", answer: "Three", category: "Sports & Games" },
+  { question: "Which country is the sport of cricket most popular in, having won multiple ICC World Cups?", answer: "Australia", category: "Sports & Games" }
+];
+
+// Export if running in Node.js environment, otherwise define globally
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  module.exports = TRIVIA_QUESTIONS;
+}
