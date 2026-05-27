@@ -119,11 +119,12 @@ const app = {
   firstPlaceWinner: null, // peerId
   secondPlaceWinner: null, // peerId
   playersGuessedCorrectly: new Set(), // Set of peerId
-  
+
   // Bot handles
   bots: [], // Array of Bot simulated objects
   botTypingTimeouts: [],
   botGuessTimeouts: [],
+  nextQuestionTimeout: null, // Timeout for advancing to next question
   
   // Networking
   peer: null,
@@ -613,9 +614,10 @@ function syncGameStateFromHost(data) {
   
   // Handle layout visibilities
   document.getElementById("game-start-prompt").classList.add("hidden");
-  
+
   if (app.gameState === GameState.GAME_OVER) {
-    showEndScreen(data.leaderboard);
+    // Game ended - keep chat visible with final scores
+    // No splash screen needed
   } else if (app.gameState === GameState.QUESTION_INTERMISSION) {
     // Round concluded, show intermission clue reveal
     document.getElementById("clue-display").innerText = data.correctAnswer;
@@ -705,7 +707,7 @@ function changeCategory(category) {
 
 // Trigger Game Start (From UI or /start command)
 function triggerGameStart() {
-  if (!app.isHost || app.gameState !== GameState.LOBBY) return;
+  if (!app.isHost || (app.gameState !== GameState.LOBBY && app.gameState !== GameState.GAME_OVER)) return;
   
   // Close mobile sidebar if open
   document.getElementById("game-sidebar").classList.remove("open");
@@ -761,14 +763,19 @@ function triggerGameStart() {
 function resetToLobby() {
   app.screens.end.classList.add("hidden");
   app.screens.game.classList.remove("hidden");
-  
+
   app.gameState = GameState.LOBBY;
   app.currentQuestionIndex = -1;
-  
+
+  // Clear any pending timers
+  if (app.roundTimer) clearInterval(app.roundTimer);
+  if (app.nextQuestionTimeout) clearTimeout(app.nextQuestionTimeout);
+  clearBotTimeouts();
+
   // Clear chat
   const chatMessages = document.getElementById("chat-messages");
   chatMessages.innerHTML = '';
-  
+
   // Re-append Lobby start prompt
   chatMessages.appendChild(document.getElementById("game-start-prompt"));
   if (app.isHost) {
@@ -777,18 +784,18 @@ function resetToLobby() {
   } else {
     document.getElementById("game-start-prompt").classList.add("hidden");
   }
-  
+
   // Reset players scores to 0
   Object.keys(app.players).forEach(pid => {
     app.players[pid].score = 0;
   });
   updateLeaderboard();
-  
+
   // Reset headers
   document.getElementById("question-tracker").innerText = "Round 0 of 10";
   document.getElementById("question-display").innerText = "Waiting for game to start...";
   document.getElementById("clue-display").innerText = "--------";
-  
+
   // Reset timer UI
   updateTimerUI(50);
 
@@ -797,7 +804,7 @@ function resetToLobby() {
       type: 'player_list',
       players: app.players
     });
-    
+
     broadcast({
       type: 'sync_game_state',
       gameState: app.gameState,
@@ -809,7 +816,7 @@ function resetToLobby() {
       correctAnswer: ''
     });
   }
-  
+
   updateEndGameButtonVisibility();
 }
 
@@ -986,9 +993,10 @@ function revealAnswerAndEndRound() {
   
   syncAllClients();
   updateEndGameButtonVisibility();
-  
+
   // Wait 6 seconds before loading next question
-  setTimeout(() => {
+  if (app.nextQuestionTimeout) clearTimeout(app.nextQuestionTimeout);
+  app.nextQuestionTimeout = setTimeout(() => {
     if (app.gameState === GameState.QUESTION_INTERMISSION) {
       nextQuestion();
     }
@@ -1057,10 +1065,10 @@ function handleChatMessage(senderId, text) {
   
   // Check if starting command
   if (text.toLowerCase() === '/start') {
-    if (app.gameState === GameState.LOBBY) {
+    if (app.gameState === GameState.LOBBY || app.gameState === GameState.GAME_OVER) {
       triggerGameStart();
     } else {
-      addSystemMessage("Game has already started!");
+      addSystemMessage("Game is currently in progress!");
     }
     return;
   }
@@ -1408,18 +1416,55 @@ function renderTypingIndicator() {
 // Game Over handler (Host Authoritative)
 function endGame() {
   if (!app.isHost) return;
-  
+
   app.gameState = GameState.GAME_OVER;
   clearInterval(app.roundTimer);
+  if (app.nextQuestionTimeout) clearTimeout(app.nextQuestionTimeout);
   clearBotTimeouts();
-  
+
   triggerSoundDirectly('gameOver');
-  
-  // Calculate final leaderboard lists
-  const finalLeaderboard = app.players;
+
+  // Announce final scores in chat
+  const sortedPlayers = Object.values(app.players)
+    .sort((a, b) => b.score - a.score);
+
+  addSystemMessage("🎮 Game Over! Final Leaderboard:", 'announcement');
+
+  sortedPlayers.forEach((player, index) => {
+    const medal = index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : '•';
+    addSystemMessage(`${medal} ${escapeHTML(player.name)}: ${player.score} points`);
+  });
+
+  addSystemMessage("Type /start to play another round!", 'announcement');
+
+  if (!app.isSolo) {
+    broadcast({
+      type: 'system_message',
+      text: "🎮 Game Over! Final Leaderboard:",
+      cssClass: 'announcement'
+    });
+
+    sortedPlayers.forEach((player, index) => {
+      const medal = index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : '•';
+      broadcast({
+        type: 'system_message',
+        text: `${medal} ${escapeHTML(player.name)}: ${player.score} points`
+      });
+    });
+
+    broadcast({
+      type: 'system_message',
+      text: "Type /start to play another round!",
+      cssClass: 'announcement'
+    });
+  }
+
+  // Enable category selector so host can change it for next round
+  if (app.isHost) {
+    document.getElementById("category-selector").disabled = false;
+  }
+
   syncAllClients();
-  
-  showEndScreen(finalLeaderboard);
   updateEndGameButtonVisibility();
 }
 
