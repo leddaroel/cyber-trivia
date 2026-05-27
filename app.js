@@ -606,7 +606,7 @@ function syncGameStateFromHost(data) {
   // Update header text
   document.getElementById("question-tracker").innerText = data.questionIndex >= 0 ? `Question ${data.questionIndex + 1} of 10` : "Round 0 of 10";
   document.getElementById("question-display").innerText = data.questionText;
-  document.getElementById("clue-display").innerText = data.clue;
+  document.getElementById("clue-display").innerText = data.clue.toUpperCase();
   document.getElementById("category-selector").value = data.category;
   
   // Timer circular update
@@ -619,8 +619,8 @@ function syncGameStateFromHost(data) {
     // Game ended - keep chat visible with final scores
     // No splash screen needed
   } else if (app.gameState === GameState.QUESTION_INTERMISSION) {
-    // Round concluded, show intermission clue reveal
-    document.getElementById("clue-display").innerText = data.correctAnswer;
+    // Round concluded, show intermission hint reveal
+    document.getElementById("clue-display").innerText = data.correctAnswer.toUpperCase();
   } else if (app.gameState === GameState.LOBBY) {
     // Transition back to lobby from Game Over
     app.screens.end.classList.add("hidden");
@@ -856,9 +856,17 @@ function nextQuestion() {
   // Render host side
   document.getElementById("question-tracker").innerText = `Question ${app.currentQuestionIndex + 1} of 10`;
   document.getElementById("question-display").innerText = qData.question;
-  document.getElementById("clue-display").innerText = app.currentClue;
-  
+  document.getElementById("clue-display").innerText = app.currentClue.toUpperCase();
+
   addSystemMessage(`[${qData.category}] Question ${app.currentQuestionIndex + 1}: ${qData.question}`, 'announcement');
+
+  if (!app.isSolo) {
+    broadcast({
+      type: 'system_message',
+      text: `[${qData.category}] Question ${app.currentQuestionIndex + 1}: ${qData.question}`,
+      cssClass: 'announcement'
+    });
+  }
   
   // Start countdown & reveal timers
   startRoundTimer();
@@ -915,12 +923,12 @@ function scheduleLetterReveals(answer) {
       }).join('');
 
       // Update UI & Broadcast
-      document.getElementById("clue-display").innerText = app.currentClue;
-      addSystemMessage(`💡 Hint revealed: ${app.currentClue}`, 'hint');
+      document.getElementById("clue-display").innerText = app.currentClue.toUpperCase();
+      addSystemMessage(`💡 Hint revealed: ${app.currentClue.toUpperCase()}`, 'hint');
       if (!app.isSolo) {
         broadcast({
           type: 'system_message',
-          text: `💡 Hint revealed: ${app.currentClue}`,
+          text: `💡 Hint revealed: ${app.currentClue.toUpperCase()}`,
           cssClass: 'hint'
         });
       }
@@ -993,10 +1001,10 @@ function revealAnswerAndEndRound() {
   
   // Clear bots
   clearBotTimeouts();
-  
-  // Show full answer on Clue panel
-  document.getElementById("clue-display").innerText = app.currentAnswer;
-  
+
+  // Show full answer on Hint panel
+  document.getElementById("clue-display").innerText = app.currentAnswer.toUpperCase();
+
   addSystemMessage(`QuizMaster: Time's Up! The correct answer was "${app.currentAnswer}".`, 'announcement');
   
   syncAllClients();
