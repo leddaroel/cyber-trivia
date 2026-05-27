@@ -905,7 +905,7 @@ function scheduleLetterReveals(answer) {
       
       // Reveal the character
       app.revealedIndices.add(charIndex);
-      
+
       // Update clue string
       app.currentClue = answer.split('').map((char, index) => {
         if (/[a-zA-Z0-9]/.test(char)) {
@@ -913,11 +913,19 @@ function scheduleLetterReveals(answer) {
         }
         return char;
       }).join('');
-      
+
       // Update UI & Broadcast
       document.getElementById("clue-display").innerText = app.currentClue;
+      addSystemMessage(`💡 Hint revealed: ${app.currentClue}`, 'hint');
+      if (!app.isSolo) {
+        broadcast({
+          type: 'system_message',
+          text: `💡 Hint revealed: ${app.currentClue}`,
+          cssClass: 'hint'
+        });
+      }
       syncAllClients();
-      
+
       // Soft sound alert for reveal
       triggerSoundDirectly('tick');
     }, delay);
